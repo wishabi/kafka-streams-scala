@@ -10,6 +10,7 @@ import org.apache.kafka.streams.state.KeyValueStore
 import org.apache.kafka.common.utils.Bytes
 import ImplicitConversions._
 import FunctionConversions._
+import org.apache.kafka.common.serialization.Serde
 
 /**
  * Wraps the Java class KTable and delegates method calls to the underlying Java object.
@@ -90,6 +91,25 @@ class KTableS[K, V](val inner: KTable[K, V]) {
     materialized: Materialized[K, VR, KeyValueStore[Bytes, Array[Byte]]]): KTableS[K, VR] = {
 
     inner.outerJoin[VO, VR](other.inner, joiner.asValueJoiner, materialized)
+  }
+
+  def oneToManyJoin[V0, KL, VL, KR, VR](other: KTableS[KR, VR],
+                                    keyExtractor: ValueMapper[VR, KL],
+                                    joiner: ValueJoiner[VL, VR, V0],
+                                    materialized: Materialized[KR, V0, KeyValueStore[Bytes, Array[Byte]]],
+                                    thisKeySerde: Serde[KL],
+                                    otherKeySerde: Serde[KR],
+                                    otherValueSerde: Serde[VR],
+                                    joinedValueSerde: Serde[V0]
+                                    ): KTableS[KR, V0] = {
+    inner.oneToManyJoin(other.inner,
+      keyExtractor,
+      joiner,
+      materialized,
+      thisKeySerde,
+      otherKeySerde,
+      otherValueSerde,
+      joinedValueSerde)
   }
 
   def queryableStoreName: String =

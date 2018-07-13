@@ -12,7 +12,7 @@ object Dependencies {
         .excludeAll(ExclusionRule("org.slf4j"))
   }
 
-  val kafkaStreams = "org.apache.kafka"                % "kafka-streams"     % KafkaVersion
+  val kafkaStreams = "org.apache.kafka"                % "kafka-streams"     % KafkaStreamsVersion
   val scalaLogging = "com.typesafe.scala-logging"     %% "scala-logging"     % ScalaLoggingVersion
   val logback = "ch.qos.logback"                       % "logback-classic"   % LogbackVersion
   val kafka = "org.apache.kafka"                      %% "kafka"             % KafkaVersion
