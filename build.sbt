@@ -4,7 +4,7 @@ name := "kafka-streams-scala"
 
 organization := "com.lightbend"
 
-version := "0.2.1"
+version := "0.2.1-flipp"
 
 scalaVersion := Versions.Scala_2_12_Version
 
@@ -13,6 +13,15 @@ crossScalaVersions := Versions.CrossScalaVersions
 scalacOptions := Seq("-Xexperimental", "-unchecked", "-deprecation", "-Ywarn-unused-import")
 
 parallelExecution in Test := false
+
+val flipplib = "http://flipplib.jfrog.io/flipplib/"
+
+resolvers ++= Seq(
+  Resolver.mavenLocal,
+  "Flipplib Ext-Releases-Local" at flipplib + "ext-release-local",
+  "FlippLib Snapshots" at flipplib + "libs-snapshot-local",
+  "FlippLib Releases" at flipplib + "libs-release-local"
+)
 
 libraryDependencies ++= Seq(
   kafkaStreams excludeAll(ExclusionRule("org.slf4j", "slf4j-log4j12"), ExclusionRule("org.apache.zookeeper", "zookeeper")),
@@ -46,12 +55,6 @@ homepage := scmInfo.value map (_.browseUrl)
 scmInfo := Some(ScmInfo(url("https://github.com/lightbend/kafka-streams-scala"), "git@github.com:lightbend/kafka-streams-scala.git"))
 
 credentials += Credentials(Path.userHome / ".ivy2" / ".credentials")
-
-publishTo := {
-  val nexus = "https://oss.sonatype.org/"
-  if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
-  else Some("releases" at nexus + "service/local/staging/deploy/maven2")
-}
 
 publishMavenStyle := true
 
