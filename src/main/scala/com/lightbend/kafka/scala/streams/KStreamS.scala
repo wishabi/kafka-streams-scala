@@ -36,7 +36,15 @@ class KStreamS[K, V](val inner: KStream[K, V]) {
   }
 
   def mapValues[VR](mapper: V => VR): KStreamS[K, VR] = {
-    inner.mapValues[VR](mapper(_))
+    inner.mapValues[VR](new ValueMapper[V, VR] {
+      override def apply(value: V): VR = mapper(value)
+    })
+  }
+
+  def mapValues[VR](mapper: (K, V) => VR): KStreamS[K, VR] = {
+    inner.mapValues[VR](new ValueMapperWithKey[K, V, VR] {
+      override def apply(k: K, v: V): VR = mapper(k,v)
+    })
   }
 
   def flatMap[KR, VR](mapper: (K, V) => Iterable[(KR, VR)]): KStreamS[KR, VR] = {
@@ -45,7 +53,15 @@ class KStreamS[K, V](val inner: KStream[K, V]) {
   }
 
   def flatMapValues[VR](processor: V => Iterable[VR]): KStreamS[K, VR] = {
-    inner.flatMapValues[VR]((v) => processor(v).asJava)
+    inner.flatMapValues[VR](new ValueMapper[V, java.lang.Iterable[VR]] {
+      override def apply(v: V): java.lang.Iterable[VR] = processor(v).asJava
+    })
+  }
+
+  def flatMapValues[VR](processor: (K, V) => Iterable[VR]): KStreamS[K, VR] = {
+    inner.flatMapValues[VR](new ValueMapperWithKey[K, V, java.lang.Iterable[VR]] {
+      override def apply(k: K, v: V): java.lang.Iterable[VR] = processor(k,v).asJava
+    })
   }
 
   def print(printed: Printed[K, V]): Unit = inner.print(printed)

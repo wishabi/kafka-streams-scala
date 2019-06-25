@@ -112,6 +112,25 @@ class KTableS[K, V](val inner: KTable[K, V]) {
       joinedValueSerde)
   }
 
+  def leftJoinOnForeignKey[V0, KL, VL, KR, VR](other: KTableS[KR, VR],
+                                           keyExtractor: ValueMapper[VL, KR],
+                                           joiner: ValueJoiner[VL, VR, V0],
+                                           materialized: Materialized[KL, V0, KeyValueStore[Bytes, Array[Byte]]],
+                                           thisKeySerde: Serde[KL],
+                                           thisValueSerde: Serde[VL],
+                                           otherKeySerde: Serde[KR],
+                                           joinedValueSerde: Serde[V0]
+                                          ): KTableS[KL, V0] = {
+    inner.leftJoinOnForeignKey(other.inner,
+      keyExtractor,
+      joiner,
+      materialized,
+      thisKeySerde,
+      thisValueSerde,
+      otherKeySerde,
+      joinedValueSerde)
+  }
+
   def queryableStoreName: String =
     inner.queryableStoreName
 }
